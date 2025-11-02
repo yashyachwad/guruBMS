@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="home" >
+    <h2 style="margin-left: 30%; font-size: 40px;">💰 Welcome to Dashboard</h2>
+
+      <div class="homeinput">
+        
+                    <input  id="amount" placeholder="Enter amount" type="number" min="1">
+                    <select class="dash" id="type">
+                      <option value="deposit">Deposit</option>
+                      <option value="withdrawal">Withdrawal</option>
+                    </select>
+                    <button style="margin-left: 70px;" id="btn" onclick="addTransaction()">Submit</button>
+
+                    <h3 style="margin-left: 30%; font: bold;">Transaction History</h3>
+                    <ul style="margin-left: 30%; color: wheat;"  id="transactions"></ul>
+      </div>
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    const userId = localStorage.getItem("userId");
+    if (!userId) window.location = "index.html";
+
+    async function addTransaction() {
+      const amount = document.getElementById("amount").value;
+      const type = document.getElementById("type").value;
+
+      if (!amount || amount <= 0) return alert("Please enter valid amount");
+
+      try {
+        const res = await fetch(`http://localhost:4000/api/transactions/${type}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, amount }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || "Transaction failed");
+
+        alert(data.message);
+        document.getElementById("amount").value = "";
+        await loadTransactions();
+      } catch (err) {
+        console.error("❌ Add Transaction Error:", err);
+        alert(err.message);
+      }
+    }
+
+    async function loadTransactions() {
+      try {
+        const res = await fetch(`http://localhost:4000/api/transactions/history/${userId}`);
+        if (!res.ok) throw new Error("Database error while fetching history");
+
+        const data = await res.json();
+        const list = document.getElementById("transactions");
+        list.innerHTML = data.length
+          ? data.map(t => `<li>${t.type} ₹${t.amount} (${new Date(t.date).toLocaleString()})</li>`).join("")
+          : "<li>No transactions yet.</li>";
+      } catch (err) {
+        console.error("❌ Load Transactions Error:", err);
+        alert(err.message);
+      }
+    }
+
+    loadTransactions();
+  </script>
+</body>
+</html>
