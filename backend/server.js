@@ -9,8 +9,15 @@ const transactionRoutes = require("./routes/transaction");
 const app = express();
 
 // Middleware
-app.use(cors());
+
 app.use(express.json());
+app.use(
+  cors({
+    origin: "*", // allow all origins for now (for testing)
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Serve frontend files (public folder)
 app.use(express.static(path.join(__dirname, "../public")));

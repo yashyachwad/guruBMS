@@ -47,7 +47,7 @@
       if (!amount || amount <= 0) return alert("Please enter valid amount");
 
       try {
-        const res = await fetch(`http://localhost:4000/api/transactions/${type}`, {
+        const res = await fetch(`https://guru-bank-system.onrender.com/api/transactions/${type}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id: userId, amount }),
@@ -68,7 +68,7 @@
 
     async function loadTransactions() {
       try {
-        const res = await fetch(`http://localhost:4000/api/transactions/history/${userId}`);
+        const res = await fetch(`https://guru-bank-system.onrender.com/api/transactions/history/${userId}`);
         if (!res.ok) throw new Error("Database error while fetching history");
 
         const data = await res.json();
